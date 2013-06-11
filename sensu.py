@@ -7,7 +7,6 @@ import os
 import json
 import requests
 import time
-from collections import Counter
 from datetime import datetime
 
 def process_response(response):
@@ -64,21 +63,3 @@ def unsilence(uri, path):
     response = requests.delete(uri+'/stashes/silence/'+path)
     result = process_response(response)
     return "Deleted stash at %s/stashes/silence/%s" % (uri, path,)
-
-def summarize_events(self, api):
-    events = self.get_events(api)
-    event_counter = Counter()
-
-    for event in events:
-        if event['flapping'] == True:
-            event_counter['flapping'] += 1
-        if event['status'] == 2:
-            event_counter['critical'] += 1
-        elif event['status'] == 1:
-            event_counter['warning'] += 1
-        elif event['status'] == 0:
-            pass
-        else:
-            event_counter['unknown'] += 1
-
-    return "unknown: %s, warning: %s, critical: %s" % (event_counter['unknown'],event_counter['warning'],event_counter['critical'])

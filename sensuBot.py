@@ -3,8 +3,9 @@ from errbot import BotPlugin, botcmd
 import config
 import logging
 import requests
+from collections import Counter
 
-from sensu import get_events, get_stashes, get_silenced, summarize_events, silence, unsilence
+from sensu import get_events, get_stashes, get_silenced, silence, unsilence
 
 
 class Sensu(BotPlugin):
@@ -30,10 +31,28 @@ class Sensu(BotPlugin):
         else:
             return uri
 
+    def summarize_events(self, uri):
+        events = get_events(uri)
+        event_counter = Counter()
+
+        for event in events:
+            if event['flapping'] == True:
+                event_counter['flapping'] += 1
+            if event['status'] == 2:
+                event_counter['critical'] += 1
+            elif event['status'] == 1:
+                event_counter['warning'] += 1
+            elif event['status'] == 0:
+                pass
+            else:
+                event_counter['unknown'] += 1
+
+        return "unknown: %s, warning: %s, critical: %s" % (event_counter['unknown'],event_counter['warning'],event_counter['critical'])
+
     @botcmd(split_args_with=None)
     def sensu_summarize(self, mess, args):
         api = self.resolve_endpoint(args[0])
-        return summarize_events(api)
+        return self.summarize_events(api)
 
     @botcmd(split_args_with=None)
     def sensu_silence(self, mess, args):
