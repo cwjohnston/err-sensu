@@ -1,0 +1,6 @@
+[Core]
+Name = Sensu
+Module = sensuBot
+
+[Documentation]
+Description = Interact with Sensu API
