@@ -58,8 +58,19 @@ class Sensu(BotPlugin):
     def sensu_silence(self, mess, args):
         owner = mess.getFrom().getStripped()
         api = self.resolve_endpoint(args[0])
-        path = args[1]
-        expires = None
+        if args[2]:
+            path = args[1]
+        else:
+            return "Sorry, you need to specify the path for me to silence"
+
+        if args[2]:
+            try:
+                expires = int(args[2])
+            except ValueError:
+                return "Sorry, I couldn't turn %s into an integer" % (args[2],)
+        else:
+            expires = None
+
         return silence(api, owner, path, expires)
 
     @botcmd(split_args_with=None)
@@ -85,8 +96,3 @@ class Sensu(BotPlugin):
             return "No silenced clients/checks found"
         else:
             return result
-
-
-
-
-

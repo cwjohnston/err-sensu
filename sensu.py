@@ -7,7 +7,8 @@ import os
 import json
 import requests
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 def process_response(response):
     if response.status_code in (200, 201,):
@@ -44,15 +45,18 @@ def get_stashes(uri):
 def resolve(uri, path):
     pass
 
-def silence(uri, owner, path, expires=None):
+def silence(uri, owner, path, duration=None):
     dt = datetime.now()
     timestamp = time.mktime(dt.timetuple())
     payload = { 'owner': owner, 'timestamp': timestamp }
 
-    if expires is None:
+    if duration is None:
         pass
     else:
-        payload['expires'] = expires
+        dt = datetime.now()
+        expire_time = dt + timedelta(minutes=duration)
+        expire_timestamp = time.mktime(expire_time.timetuple())
+        payload['expires'] = expire_timestamp
 
     response = requests.post(uri+'/stashes/silence/'+path, data=json.dumps(payload))
 
