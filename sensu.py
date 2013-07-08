@@ -3,7 +3,6 @@
 """Interact with the Sensu API"""
 
 import re
-import os
 import json
 import requests
 import time
@@ -24,10 +23,12 @@ def process_response(response):
         print "response body: %s" % response.json()
         raise Exception('Something went wrong, you should check the Sensu API')
 
+
 def get_events(uri):
     response = requests.get(uri+'/events')
     result = process_response(response)
     return result
+
 
 def get_silenced(uri):
     silenced = []
@@ -37,18 +38,21 @@ def get_silenced(uri):
             silenced.append(stash)
     return silenced
 
+
 def get_stashes(uri):
     response = requests.get(uri+'/stashes')
     result = process_response(response)
     return result
 
+
 def resolve(uri, path):
     pass
+
 
 def silence(uri, owner, path, duration=None):
     dt = datetime.now()
     timestamp = time.mktime(dt.timetuple())
-    payload = { 'owner': owner, 'timestamp': timestamp }
+    payload = {'owner': owner, 'timestamp': timestamp}
 
     if duration is None:
         pass
@@ -62,6 +66,7 @@ def silence(uri, owner, path, duration=None):
 
     result = process_response(response)
     return "Created a silence stash at %s/stashes/%s" % (uri, result['path'],)
+
 
 def unsilence(uri, path):
     response = requests.delete(uri+'/stashes/silence/'+path)

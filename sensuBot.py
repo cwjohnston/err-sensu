@@ -1,8 +1,4 @@
 from errbot import BotPlugin, botcmd
-
-import config
-import logging
-import requests
 from collections import Counter
 
 from sensu import get_events, get_stashes, get_silenced, silence, unsilence
@@ -10,12 +6,12 @@ from sensu import get_events, get_stashes, get_silenced, silence, unsilence
 
 class Sensu(BotPlugin):
     """An Err plugin Sensu"""
-    min_err_version = '1.6.0' # Optional, but recommended
-    max_err_version = '2.0.0' # Optional, but recommended
+    min_err_version = '1.6.0'  # Optional, but recommended
+    max_err_version = '2.0.0'  # Optional, but recommended
 
     def get_configuration_template(self):
         """Defines the configuration structure this plugin supports"""
-        return {'ENDPOINTS':[{'ENVIRONMENT': 'staging', 'URI': 'http://sensu.staging.example.com'}]}
+        return {'ENDPOINTS': [{'ENVIRONMENT': 'staging', 'URI': 'http://sensu.staging.example.com'}]}
 
     def resolve_endpoint(self, env):
         """ Returns API endpoint URI """
@@ -36,7 +32,7 @@ class Sensu(BotPlugin):
         event_counter = Counter()
 
         for event in events:
-            if event['flapping'] == True:
+            if event['flapping'] is True:
                 event_counter['flapping'] += 1
             if event['status'] == 2:
                 event_counter['critical'] += 1
@@ -47,7 +43,7 @@ class Sensu(BotPlugin):
             else:
                 event_counter['unknown'] += 1
 
-        return "unknown: %s, warning: %s, critical: %s" % (event_counter['unknown'],event_counter['warning'],event_counter['critical'])
+        return "unknown: %s, warning: %s, critical: %s" % (event_counter['unknown'], event_counter['warning'], event_counter['critical'])
 
     @botcmd(split_args_with=None)
     def sensu_summarize(self, mess, args):
