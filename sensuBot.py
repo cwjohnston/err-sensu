@@ -106,7 +106,7 @@ class Sensu(BotPlugin):
     @botcmd(split_args_with=None)
     def sensu_stalestashlist(self, mess, args):
         config = self.resolve_endpoint(args[0])
-        if args[1]:
+        if len(args) > 1:
             stale_after = int(args[1])
         else:
             stale_after = 30
