@@ -110,4 +110,10 @@ class Sensu(BotPlugin):
             stale_after = int(args[1])
         else:
             stale_after = 30
-        return self.announce_stale_stashes(config, stale_after)
+
+        stale_stashes = get_stale_stashes(config['URI'], stale_after)
+        stale_stash_names = []
+        for stash in stale_stashes:
+            stale_stash_names.append(stash['path'])
+
+        return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ' ,'.join(stale_stash_names))
