@@ -1,7 +1,7 @@
 from errbot import BotPlugin, botcmd
 from collections import Counter
 
-from sensu import get_events, get_stashes, get_stale_stashes, get_silenced, silence, unsilence
+from sensu import get_events, get_stashes, get_stale_stashes, silence, unsilence
 
 
 class Sensu(BotPlugin):
