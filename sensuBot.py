@@ -1,13 +1,21 @@
 from errbot import BotPlugin, botcmd
 from collections import Counter
 
-from sensu import get_events, get_stashes, get_silenced, silence, unsilence
+from sensu import get_events, get_stashes, get_stale_stashes, get_silenced, silence, unsilence
 
 
 class Sensu(BotPlugin):
     """An Err plugin Sensu"""
     min_err_version = '1.6.0'  # Optional, but recommended
     max_err_version = '2.0.0'  # Optional, but recommended
+
+    def announce_stale_stashes(self, config, stale_after):
+        stale_stashes = get_stale_stashes(config['URI'], stale_after, filter='silence')
+        stale_stash_names = []
+        for stash in stale_stashes:
+            stale_stash_names.append(stash['path'])
+
+        return "Stale stashes in %s : " % (config['ENVIRONMENT'], str.join(stale_stash_names, " ,"))
 
     def get_configuration_template(self):
         """Defines the configuration structure this plugin supports"""
@@ -94,3 +102,12 @@ class Sensu(BotPlugin):
             return "No silenced clients/checks found"
         else:
             return result
+
+    @botcmd(split_args_with=None)
+    def sensu_stalestashlist(self, mess, args):
+        config = self.resolve_endpoint(args[0])
+        if args[1]:
+            stale_after = int(args[1])
+        else:
+            stale_after = 30
+        self.announce_stale_stashes(config, stale_after)
