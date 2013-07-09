@@ -13,9 +13,10 @@ class Sensu(BotPlugin):
         stale_stashes = get_stale_stashes(config['URI'], stale_after)
         stale_stash_names = []
         for stash in stale_stashes:
-            stale_stash_names.append(stash['path'])
+            stripped_name = stash['path'].replace('silence/', '')
+            stale_stash_names.append(stripped_name)
 
-        return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ' ,'.join(stale_stash_names))
+        return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ', '.join(stale_stash_names))
 
     def get_configuration_template(self):
         """Defines the configuration structure this plugin supports"""
@@ -114,6 +115,7 @@ class Sensu(BotPlugin):
         stale_stashes = get_stale_stashes(config['URI'], stale_after)
         stale_stash_names = []
         for stash in stale_stashes:
-            stale_stash_names.append(stash['path'])
+            stripped_name = stash['path'].replace('silence/', '')
+            stale_stash_names.append(stripped_name)
 
-        return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ' ,'.join(stale_stash_names))
+        return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ', '.join(stale_stash_names))
