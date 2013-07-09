@@ -14,18 +14,19 @@ class Sensu(BotPlugin):
         return {'ENDPOINTS': [{'ENVIRONMENT': 'staging', 'URI': 'http://sensu.staging.example.com'}]}
 
     def resolve_endpoint(self, env):
-        """ Returns API endpoint URI """
-        uri = None
+        """ Returns endpoint configuration dict"""
+        endpoint_config = None
         for endpoint in self.config['ENDPOINTS']:
             if endpoint['ENVIRONMENT'] == env:
-                uri = endpoint['URI']
+                endpoint_config = endpoint
+                break
             else:
                 pass
 
-        if uri is None:
+        if endpoint_config is None:
             raise Exception('Sorry, I could not match your request to a known API endpoint')
         else:
-            return uri
+            return endpoint_config
 
     def summarize_events(self, uri):
         events = get_events(uri)
@@ -47,13 +48,14 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_summarize(self, mess, args):
-        api = self.resolve_endpoint(args[0])
-        return self.summarize_events(api)
+        config = self.resolve_endpoint(args[0])
+        return self.summarize_events(config['URI'])
 
     @botcmd(split_args_with=None)
     def sensu_silence(self, mess, args):
         owner = mess.getFrom().getStripped()
-        api = self.resolve_endpoint(args[0])
+        config = self.resolve_endpoint(args[0])
+
         if args[2]:
             path = args[1]
         else:
@@ -67,18 +69,18 @@ class Sensu(BotPlugin):
         else:
             expires = None
 
-        return silence(api, owner, path, expires)
+        return silence(config['URI'], owner, path, expires)
 
     @botcmd(split_args_with=None)
     def sensu_unsilence(self, mess, args):
-        api = self.resolve_endpoint(args[0])
+        config = self.resolve_endpoint(args[0])
         path = args[1]
-        return unsilence(api, path)
+        return unsilence(config['URI'], path)
 
     @botcmd(split_args_with=None)
     def sensu_stashlist(self, mess, args):
-        api = self.resolve_endpoint(args[0])
-        result = get_stashes(api)
+        config = self.resolve_endpoint(args[0])
+        result = get_stashes(config['URI'])
         if result == []:
             return "No stashes found"
         else:
@@ -86,8 +88,8 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_silencelist(self, mess, args):
-        api = self.resolve_endpoint(args[0])
-        result = get_silenced(api)
+        config = self.resolve_endpoint(args[0])
+        result = get_silenced(config['URI'])
         if result == []:
             return "No silenced clients/checks found"
         else:
