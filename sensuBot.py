@@ -10,7 +10,7 @@ class Sensu(BotPlugin):
     max_err_version = '2.0.0'  # Optional, but recommended
 
     def announce_stale_stashes(self, config, stale_after):
-        stale_stashes = get_stale_stashes(config['URI'], stale_after, filter='silence')
+        stale_stashes = get_stale_stashes(config['URI'], stale_after)
         stale_stash_names = []
         for stash in stale_stashes:
             stale_stash_names.append(stash['path'])
