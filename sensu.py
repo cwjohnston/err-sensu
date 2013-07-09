@@ -30,19 +30,34 @@ def get_events(uri):
     return result
 
 
-def get_silenced(uri):
-    silenced = []
-    stashes = get_stashes(uri)
-    for stash in stashes:
-        if re.search(r'^silence/.*', stash['path']):
-            silenced.append(stash)
-    return silenced
-
-
-def get_stashes(uri):
+def get_stashes(uri, filter_path='silence'):
     response = requests.get(uri+'/stashes')
-    result = process_response(response)
-    return result
+    all_stashes = process_response(response)
+    filtered_stashes = []
+
+    if filter_path:
+        for stash in all_stashes:
+            if re.search(r'^%s/.*' % (filter_path,), stash['path']):
+                filtered_stashes.append(stash)
+
+        return filtered_stashes
+    else:
+        return all_stashes
+
+
+def get_stale_stashes(uri, stale_after, filter_path='silence'):
+    stashes = get_stashes(uri, filter_path=filter_path)
+    stale_stashes = []
+    for stash in stashes:
+        if 'timestamp' in stash['content']:
+            now = datetime.now()
+            then = datetime.fromtimestamp(int(stash['content']['timestamp']))
+            became_stale = then + timedelta(minutes=stale_after)
+
+            if now > became_stale:
+                stale_stashes.append(stash)
+
+    return stale_stashes
 
 
 def resolve(uri, path):
@@ -65,7 +80,7 @@ def silence(uri, owner, path, duration=None):
     response = requests.post(uri+'/stashes/silence/'+path, data=json.dumps(payload))
 
     result = process_response(response)
-    return "Created a silence stash at %s/stashes/%s" % (uri, result['path'],)
+    return "Silenced %s for %s minutes" % (result['path'], duration,)
 
 
 def unsilence(uri, path):
