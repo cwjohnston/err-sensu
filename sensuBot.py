@@ -97,7 +97,7 @@ class Sensu(BotPlugin):
     @botcmd(split_args_with=None)
     def sensu_silencelist(self, mess, args):
         config = self.resolve_endpoint(args[0])
-        result = get_silenced(config['URI'])
+        result = get_stashes(config['URI'])
         if result == []:
             return "No silenced clients/checks found"
         else:
