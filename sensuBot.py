@@ -110,4 +110,4 @@ class Sensu(BotPlugin):
             stale_after = int(args[1])
         else:
             stale_after = 30
-        self.announce_stale_stashes(config, stale_after)
+        return self.announce_stale_stashes(config, stale_after)
