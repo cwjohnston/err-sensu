@@ -129,26 +129,26 @@ class Sensu(BotPlugin):
             stale_after = 30
 
         all_stashes = get_stashes(config['URI'])
-        untimed_stashes = []
+        untimed_stash_names = []
 
         for stash in all_stashes:
-            if 'timestamp' in stash or 'expires' in stash:
+            if ('timestamp' in stash['content']) or ('expires' in stash['content']):
                 pass
             else:
-                stripped_name = stash['path'].replace('silence/', '')
-                untimed_stashes.append(stripped_name)
+                untimed_name = stash['path'].replace('silence/', '')
+                untimed_stash_names.append(untimed_name)
 
         stale_stashes = get_stale_stashes(config['URI'], stale_after)
         stale_stash_names = []
 
         for stash in stale_stashes:
-            stripped_name = stash['path'].replace('silence/', '')
-            stale_stash_names.append(stripped_name)
+            stale_name = stash['path'].replace('silence/', '')
+            stale_stash_names.append(stale_name)
 
         messages = []
 
-        if len(untimed_stashes) > 0:
-            messages.append("Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(untimed_stashes)))
+        if len(untimed_stash_names) > 0:
+            messages.append("Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(untimed_stash_names)))
 
         if len(stale_stash_names) > 0:
             messages.append("Stale stashes in %s : \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names)))
