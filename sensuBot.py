@@ -144,10 +144,14 @@ class Sensu(BotPlugin):
                 stripped_name = stash['path'].replace('silence/', '')
                 stale_stash_names.append(stripped_name)
 
+            messages = []
+
             if len(untimed_stashes) > 0:
-                yield "Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names))
+                messages.append("Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names)))
 
             if len(stale_stash_names) > 0:
-                return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ', '.join(stale_stash_names))
+                messages.append("Stale stashes in %s : %s" % (config['ENVIRONMENT'], ', '.join(stale_stash_names)))
             else:
-                return "No stale stashes found in %s" % (config['ENVIRONMENT'],)
+                messages.append("No stale stashes found in %s" % (config['ENVIRONMENT'],))
+
+            return '\n'.join(messages)
