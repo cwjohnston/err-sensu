@@ -10,8 +10,39 @@ class Sensu(BotPlugin):
     min_err_version = '1.6.0'  # Optional, but recommended
     max_err_version = '2.0.0'  # Optional, but recommended
 
-    def announce_stale_stashes(self, config, stale_after):
-        pass
+    def announce_stale_stashes(self):
+        for endpoint in self.config['ENDPOINTS']:
+            all_stashes = get_stashes(endpoint['URI'])
+            untimed_stash_names = []
+
+            for stash in all_stashes:
+                if ('timestamp' in stash['content']) or ('expires' in stash['content']):
+                    pass
+                else:
+                    untimed_name = stash['path'].replace('silence/', '')
+                    untimed_stash_names.append(untimed_name)
+
+            stale_stashes = get_stale_stashes(endpoint['URI'], self.config['DEFAULT_SILENCE_DURATION'])
+            stale_stash_names = []
+
+            for stash in stale_stashes:
+                stale_name = stash['path'].replace('silence/', '')
+                stale_stash_names.append(stale_name)
+
+            messages = []
+
+            if len(untimed_stash_names) > 0:
+                messages.append("Stashes without timing data: \n%s" % ('\n'.join(untimed_stash_names,)))
+            if len(stale_stash_names) > 0:
+                messages.append("Stale stashes: \n%s" % ('\n'.join(stale_stash_names,)))
+            else:
+                messages.append("No stale stashes found in %s" % (endpoint['ENVIRONMENT'],))
+
+            return '\n'.join(messages)
+
+    def activate(self):
+        super(Sensu, self).activate()
+        self.start_poller(self.config['DEFAULT_SILENCE_DURATION'], self.announce_stale_stashes)
 
     def get_configuration_template(self):
         """Defines the configuration structure this plugin supports"""
