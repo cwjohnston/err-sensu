@@ -48,9 +48,15 @@ def get_stashes(uri, filter_path='silence'):
 def get_stale_stashes(uri, stale_after, filter_path='silence'):
     stashes = get_stashes(uri, filter_path=filter_path)
     stale_stashes = []
+    now = datetime.now()
     for stash in stashes:
-        if 'timestamp' in stash['content']:
-            now = datetime.now()
+        if 'expires' in stash['content']:
+            expire_time = datetime.fromtimestamp(int(stash['content']['expires']))
+
+            if now > expire_time:
+                stale_stashes.append(stash)
+
+        elif 'timestamp' in stash['content']:
             then = datetime.fromtimestamp(int(stash['content']['timestamp']))
             became_stale = then + timedelta(minutes=stale_after)
 
