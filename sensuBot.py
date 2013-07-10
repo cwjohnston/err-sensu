@@ -135,7 +135,8 @@ class Sensu(BotPlugin):
             if 'timestamp' in stash or 'expires' in stash:
                 pass
             else:
-                untimed_stashes.append(stash)
+                stripped_name = stash['path'].replace('silence/', '')
+                untimed_stashes.append(stripped_name)
 
             stale_stashes = get_stale_stashes(config['URI'], stale_after)
             stale_stash_names = []
