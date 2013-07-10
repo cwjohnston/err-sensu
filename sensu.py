@@ -6,7 +6,11 @@ import re
 import json
 import requests
 import time
+import logging
 from datetime import datetime, timedelta
+
+requests_log = logging.getLogger("requests")
+requests_log.setLevel(logging.WARNING)
 
 
 def process_response(response):
