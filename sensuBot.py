@@ -147,10 +147,10 @@ class Sensu(BotPlugin):
             messages = []
 
             if len(untimed_stashes) > 0:
-                messages.append("Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names)))
+                messages.append("Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(untimed_stashes)))
 
             if len(stale_stash_names) > 0:
-                messages.append("Stale stashes in %s : %s" % (config['ENVIRONMENT'], ', '.join(stale_stash_names)))
+                messages.append("Stale stashes in %s : \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names)))
             else:
                 messages.append("No stale stashes found in %s" % (config['ENVIRONMENT'],))
 
