@@ -58,20 +58,24 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_summarize(self, mess, args):
-        config = self.resolve_endpoint(args[0])
-        return self.summarize_events(config['URI'])
+        if len(args) == 1:
+            config = self.resolve_endpoint(args[0])
+            return self.summarize_events(config['URI'])
+        else:
+            return "Usage: sensu summarize ENDPOINT"
 
     @botcmd(split_args_with=None)
     def sensu_silence(self, mess, args):
         owner = mess.getFrom().getStripped()
-        config = self.resolve_endpoint(args[0])
 
-        if args[2]:
+        if len(args) >= 2:
             path = args[1]
         else:
-            return "Sorry, you need to specify the path for me to silence"
+            return "Usage: sensu silence ENDPOINT PATH [DURATION]"
 
-        if args[2]:
+        config = self.resolve_endpoint(args[0])
+
+        if len(args) >= 3:
             try:
                 duration = int(args[2])
             except ValueError:
@@ -88,12 +92,15 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_unsilence(self, mess, args):
-        config = self.resolve_endpoint(args[0])
-        path = args[1]
-        result = unsilence(config['URI'], path)
+        if len(args) >= 2:
+            config = self.resolve_endpoint(args[0])
+            path = args[1]
+            result = unsilence(config['URI'], path)
+        else:
+            return "Usage: sensu unsilence ENDPOINT PATH"
 
         if len(result) == 0:
-            return "Unsilenced  %s" % (path.replace('silence/', ''),)
+            return "Unsilenced %s" % (path.replace('silence/', ''),)
         else:
             return "Sorry, something unexpected happened: %s" % (json.dumps(result),)
 
