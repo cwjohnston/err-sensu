@@ -80,10 +80,10 @@ def silence(uri, owner, path, duration=None):
     response = requests.post(uri+'/stashes/silence/'+path, data=json.dumps(payload))
 
     result = process_response(response)
-    return "Silenced %s for %s minutes" % (result['path'], duration,)
+    return result
 
 
 def unsilence(uri, path):
     response = requests.delete(uri+'/stashes/silence/'+path)
     result = process_response(response)
-    return "Deleted stash at %s/stashes/silence/%s" % (uri, path,)
+    return result

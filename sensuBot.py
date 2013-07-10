@@ -1,3 +1,4 @@
+import json
 from errbot import BotPlugin, botcmd
 from collections import Counter
 
@@ -72,19 +73,29 @@ class Sensu(BotPlugin):
 
         if args[2]:
             try:
-                expires = int(args[2])
+                duration = int(args[2])
             except ValueError:
                 return "Sorry, I couldn't turn %s into an integer" % (args[2],)
         else:
-            expires = None
+            duration = None
 
-        return silence(config['URI'], owner, path, expires)
+        result = silence(config['URI'], owner, path, duration)
+
+        if 'path' in result:
+            return "Silenced %s for %s minutes" % (result['path'].replace('silence/', ''), duration,)
+        else:
+            return "Sorry, something unexpected happened: %s" % (json.dumps(result),)
 
     @botcmd(split_args_with=None)
     def sensu_unsilence(self, mess, args):
         config = self.resolve_endpoint(args[0])
         path = args[1]
-        return unsilence(config['URI'], path)
+        result = unsilence(config['URI'], path)
+
+        if len(result) == 0:
+            return "Unsilenced  %s" % (path.replace('silence/', ''),)
+        else:
+            return "Sorry, something unexpected happened: %s" % (json.dumps(result),)
 
     @botcmd(split_args_with=None)
     def sensu_stashlist(self, mess, args):
