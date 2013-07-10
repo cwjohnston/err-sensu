@@ -11,13 +11,7 @@ class Sensu(BotPlugin):
     max_err_version = '2.0.0'  # Optional, but recommended
 
     def announce_stale_stashes(self, config, stale_after):
-        stale_stashes = get_stale_stashes(config['URI'], stale_after)
-        stale_stash_names = []
-        for stash in stale_stashes:
-            stripped_name = stash['path'].replace('silence/', '')
-            stale_stash_names.append(stripped_name)
-
-        return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ', '.join(stale_stash_names))
+        pass
 
     def get_configuration_template(self):
         """Defines the configuration structure this plugin supports"""
@@ -124,16 +118,36 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_stalestashlist(self, mess, args):
-        config = self.resolve_endpoint(args[0])
-        if len(args) > 1:
+        if len(args) >= 1:
+            config = self.resolve_endpoint(args[0])
+        else:
+            return "Usage: sensu stalestashlist ENDPOINT [MINUTES]"
+
+        if len(args) >= 2:
             stale_after = int(args[1])
         else:
             stale_after = 30
 
-        stale_stashes = get_stale_stashes(config['URI'], stale_after)
-        stale_stash_names = []
-        for stash in stale_stashes:
-            stripped_name = stash['path'].replace('silence/', '')
-            stale_stash_names.append(stripped_name)
+        all_stashes = get_stashes(config['URI'])
+        untimed_stashes = []
 
-        return "Stale stashes in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names))
+        for stash in all_stashes:
+            if 'timestamp' in stash or 'expires' in stash:
+                pass
+            else:
+                untimed_stashes.append(stash)
+
+            stale_stashes = get_stale_stashes(config['URI'], stale_after)
+            stale_stash_names = []
+
+            for stash in stale_stashes:
+                stripped_name = stash['path'].replace('silence/', '')
+                stale_stash_names.append(stripped_name)
+
+            if len(untimed_stashes) > 0:
+                yield "Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names))
+
+            if len(stale_stash_names) > 0:
+                return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ', '.join(stale_stash_names))
+            else:
+                return "No stale stashes found in %s" % (config['ENVIRONMENT'],)
