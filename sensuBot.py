@@ -33,6 +33,7 @@ class Sensu(BotPlugin):
             return endpoint_config
 
     def summarize_events(self, uri):
+        """Tally number of events by severity level"""
         events = get_events(uri)
         event_counter = Counter()
 
@@ -52,6 +53,7 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_summarize(self, mess, args):
+        """Summarize the number of events in flapping, critical or warning states"""
         if len(args) == 1:
             config = self.resolve_endpoint(args[0])
             return self.summarize_events(config['URI'])
@@ -60,6 +62,7 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_silence(self, mess, args):
+        """Silence a client or client/check"""
         owner = mess.getFrom().getStripped()
 
         if len(args) >= 2:
@@ -86,6 +89,7 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_unsilence(self, mess, args):
+        """Unsilence a client or client/check"""
         if len(args) >= 2:
             config = self.resolve_endpoint(args[0])
             path = args[1]
@@ -100,6 +104,7 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_stashlist(self, mess, args):
+        """List all stashes"""
         config = self.resolve_endpoint(args[0])
         result = get_stashes(config['URI'])
         if result == []:
@@ -109,6 +114,7 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_silencelist(self, mess, args):
+        """List stashes under the silence path"""
         config = self.resolve_endpoint(args[0])
         result = get_stashes(config['URI'])
         if result == []:
@@ -118,6 +124,7 @@ class Sensu(BotPlugin):
 
     @botcmd(split_args_with=None)
     def sensu_stalestashlist(self, mess, args):
+        """List stashes which are expired or otherwise past their freshness date"""
         if len(args) >= 1:
             config = self.resolve_endpoint(args[0])
         else:
