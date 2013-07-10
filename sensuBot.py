@@ -138,21 +138,21 @@ class Sensu(BotPlugin):
                 stripped_name = stash['path'].replace('silence/', '')
                 untimed_stashes.append(stripped_name)
 
-            stale_stashes = get_stale_stashes(config['URI'], stale_after)
-            stale_stash_names = []
+        stale_stashes = get_stale_stashes(config['URI'], stale_after)
+        stale_stash_names = []
 
-            for stash in stale_stashes:
-                stripped_name = stash['path'].replace('silence/', '')
-                stale_stash_names.append(stripped_name)
+        for stash in stale_stashes:
+            stripped_name = stash['path'].replace('silence/', '')
+            stale_stash_names.append(stripped_name)
 
-            messages = []
+        messages = []
 
-            if len(untimed_stashes) > 0:
-                messages.append("Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(untimed_stashes)))
+        if len(untimed_stashes) > 0:
+            messages.append("Stashes without timing data in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(untimed_stashes)))
 
-            if len(stale_stash_names) > 0:
-                messages.append("Stale stashes in %s : \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names)))
-            else:
-                messages.append("No stale stashes found in %s" % (config['ENVIRONMENT'],))
+        if len(stale_stash_names) > 0:
+            messages.append("Stale stashes in %s : \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names)))
+        else:
+            messages.append("No stale stashes found in %s" % (config['ENVIRONMENT'],))
 
-            return '\n'.join(messages)
+        return '\n'.join(messages)
