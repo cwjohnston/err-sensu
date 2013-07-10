@@ -21,7 +21,7 @@ class Sensu(BotPlugin):
 
     def get_configuration_template(self):
         """Defines the configuration structure this plugin supports"""
-        return {'ENDPOINTS': [{'ENVIRONMENT': 'staging', 'URI': 'http://sensu.staging.example.com'}]}
+        return {'ENDPOINTS': [{'ENVIRONMENT': 'staging', 'URI': 'http://sensu.staging.example.com'}], 'DEFAULT_SILENCE_DURATION': 30}
 
     def resolve_endpoint(self, env):
         """ Returns endpoint configuration dict"""
@@ -81,7 +81,7 @@ class Sensu(BotPlugin):
             except ValueError:
                 return "Sorry, I couldn't turn %s into an integer" % (args[2],)
         else:
-            duration = None
+            duration = self.config['DEFAULT_SILENCE_DURATION']
 
         result = silence(config['URI'], owner, path, duration)
 
