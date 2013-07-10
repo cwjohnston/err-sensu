@@ -136,4 +136,4 @@ class Sensu(BotPlugin):
             stripped_name = stash['path'].replace('silence/', '')
             stale_stash_names.append(stripped_name)
 
-        return "Stale stashes in %s : %s" % (config['ENVIRONMENT'], ', '.join(stale_stash_names))
+        return "Stale stashes in %s: \n%s" % (config['ENVIRONMENT'], '\n'.join(stale_stash_names))
