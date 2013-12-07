@@ -2,7 +2,7 @@ import json
 from errbot import BotPlugin, botcmd
 from collections import Counter
 
-from sensu import get_events, get_stashes, get_stale_stashes, silence, unsilence
+from sensu import get_events, get_stashes, get_stale_stashes, silence, unsilence, resolve, delete_client
 
 
 class Sensu(BotPlugin):
@@ -63,6 +63,9 @@ class Sensu(BotPlugin):
         else:
             return endpoint_config
 
+    def handle_error(result):
+        return "Sorry, something unexpected happened: %s" % (json.dumps(result),)
+
     def summarize_events(self, uri):
         """Tally number of events by severity level"""
         events = get_events(uri)
@@ -116,7 +119,7 @@ class Sensu(BotPlugin):
         if 'path' in result:
             return "Silenced %s for %s minutes" % (result['path'].replace('silence/', ''), duration,)
         else:
-            return "Sorry, something unexpected happened: %s" % (json.dumps(result),)
+            self.handle_error(result)
 
     @botcmd(split_args_with=None)
     def sensu_unsilence(self, mess, args):
@@ -131,7 +134,7 @@ class Sensu(BotPlugin):
         if len(result) == 0:
             return "Unsilenced %s" % (path.replace('silence/', ''),)
         else:
-            return "Sorry, something unexpected happened: %s" % (json.dumps(result),)
+            self.handle_error(result)
 
     @botcmd(split_args_with=None)
     def sensu_stashlist(self, mess, args):
