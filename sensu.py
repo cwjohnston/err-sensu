@@ -80,19 +80,23 @@ def resolve(uri, path):
     return result
 
 def silence(uri, owner, path, duration=None):
-    dt = datetime.now()
-    timestamp = time.mktime(dt.timetuple())
-    payload = {'owner': owner, 'timestamp': timestamp}
+    genesis = datetime(1970,1,1)
+    timestamp = int((datetime.now() - genesis).total_seconds())
+    payload = {
+        'path': 'silence/'+path,
+        'content': {
+            'owner': owner,
+            'timestamp': timestamp
+        }
+    }
 
     if duration is None:
         pass
     else:
-        dt = datetime.now()
-        expire_time = dt + timedelta(minutes=duration)
-        expire_timestamp = time.mktime(expire_time.timetuple())
-        payload['expires'] = expire_timestamp
+        payload['expire'] = int(duration) * 60
 
-    response = requests.post(uri+'/stashes/silence/'+path, data=json.dumps(payload))
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    response = requests.post(uri+'/stashes', data=json.dumps(payload), headers=headers)
 
     result = process_response(response)
     return result
