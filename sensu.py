@@ -14,7 +14,7 @@ requests_log.setLevel(logging.WARNING)
 
 
 def process_response(response):
-    if response.status_code in (200, 201,):
+    if response.status_code in (200, 201, 202):
         return response.json()
     elif response.status_code == 204:
         return {}
@@ -69,10 +69,15 @@ def get_stale_stashes(uri, stale_after, filter_path='silence'):
 
     return stale_stashes
 
+def delete_client(uri, client):
+    response = requests.delete(uri+'/clients/'+client)
+    result = process_response(response)
+    return result
 
 def resolve(uri, path):
-    pass
-
+    response = requests.delete(uri+'/events/'+path)
+    result = process_response(response)
+    return result
 
 def silence(uri, owner, path, duration=None):
     dt = datetime.now()

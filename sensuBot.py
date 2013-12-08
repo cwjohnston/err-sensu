@@ -95,6 +95,37 @@ class Sensu(BotPlugin):
             return "Usage: sensu summarize ENDPOINT"
 
     @botcmd(split_args_with=None)
+    def sensu_resolve(self, mess, args):
+        """Resolve an event"""
+        if len(args) >= 2:
+            path = args[1]
+        else:
+            return "Usage: sensu resolve ENDPOINT PATH"
+
+        config = self.resolve_endpoint(args[0])
+        result = resolve(config['URI'], path)
+        if 'issued' in result:
+            return "Successfully resolved event %s in %s" % (path, config['ENVIRONMENT'],)
+        else:
+            self.handle_error(result)
+
+    @botcmd(split_args_with=None)
+    def sensu_delclient(self, mess, args):
+        """Delete a client"""
+        if len(args) >= 1:
+            client = args[1]
+        else:
+            return "Usage: sensu delclient ENDPOINT CLIENT"
+
+        config = self.resolve_endpoint(args[0])
+        result = delete_client(config['URI'], client)
+
+        if 'issued' in result:
+            return "Successfully deleted client %s in %s" % (client, config['ENVIRONMENT'],)
+        else:
+            self.handle_error(result)
+
+    @botcmd(split_args_with=None)
     def sensu_silence(self, mess, args):
         """Silence a client or client/check"""
         owner = mess.getFrom().getStripped()
