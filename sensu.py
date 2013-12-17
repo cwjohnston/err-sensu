@@ -69,6 +69,11 @@ def get_stale_stashes(uri, stale_after, filter_path='silence'):
 
     return stale_stashes
 
+def get_info(uri):
+    response = requests.get(uri+'/info')
+    result = process_response(response)
+    return result
+
 def delete_client(uri, client):
     response = requests.delete(uri+'/clients/'+client)
     result = process_response(response)

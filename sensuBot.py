@@ -2,7 +2,7 @@ import json
 from errbot import BotPlugin, botcmd
 from collections import Counter
 
-from sensu import get_events, get_stashes, get_stale_stashes, silence, unsilence, resolve, delete_client
+from sensu import get_info, get_events, get_stashes, get_stale_stashes, silence, unsilence, resolve, delete_client
 
 
 class Sensu(BotPlugin):
@@ -84,6 +84,16 @@ class Sensu(BotPlugin):
                 event_counter['unknown'] += 1
 
         return "unknown: %s, warning: %s, critical: %s" % (event_counter['unknown'], event_counter['warning'], event_counter['critical'])
+
+    @botcmd(split_args_with=None)
+    def sensu_info(self, mess, args):
+        """Describe Sensu system state via API's info endpoint"""
+        if len(args) >= 1:
+            config = self.resolve_endpoint(args[0])
+            info = get_info(config['URI'])
+            return json.dumps(info, indent=4, sort_keys=True)
+        else:
+            return "Usage: sensu info ENDPOINT"
 
     @botcmd(split_args_with=None)
     def sensu_summarize(self, mess, args):
